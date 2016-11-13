@@ -29,12 +29,14 @@ void loop() {
   if (x_diff > 0) {
     // If sun is to the right. 
     xMotorSteps = 142 * x_diff; 
+    Serial.println("Xdiff more than 0, move to the right");
   } 
   else if (x_diff < 0) {
     xMotorSteps = (142 * x_diff) * -1; 
   }
   if ( y_diff > 0) {
     // If sun is in the top half of the telescope
+    Serial.println("Xdiff more than 0, move to the up");
     yMotorSteps = 142 * y_diff;  
   }
   else if (y_diff < 0) {
@@ -53,8 +55,13 @@ void moveMotors(int xSteps, int ySteps) {
  Serial.write("R1=" + xSteps); 
  Serial.write("X LAB Su"); 
  Serial.write("X P=0");
- int currSteps = Serial.read("P "); //Get the current position of the motors
- while (currSteps < 51200) {
+  while (Serial.available() < 0) {
+    //wait until the Lexium MDrive sends over current locaiton. 
+  }
+  int currSteps = Serial.read();
+  Serial.print("Position now");
+  Serial.println(currSteps, DEC);
+   while (currSteps < 51200) {
    //Wait for 5 miliseconds 
    Serial.write("X H 5");
    Serial.write("X MR R1");
@@ -64,14 +71,20 @@ void moveMotors(int xSteps, int ySteps) {
    Serial.write("X H"); 
    Serial.write("X PR \"move complete\""); 
    Serial.write("X H 100"); 
-   currSteps = Serial.read("P"); 
+   //Wait for feedback on the position 
+     if (Serial.available() > 0) {
+        // read the incoming byte:
+        currSteps = Serial.read();
+        Serial.print("Position now");
+        Serial.println(currSteps, DEC);
+  }
  }
 
  Serial.write("R1=" + ySteps); 
  Serial.write( "PY=1 DN=Y"); 
  Serial.write("Y LAB Su"); 
  Serial.write("Y P=0");
- currSteps = Serial.read("P "); //Get the current position of the motors
+  // send data only when you receive data:
  while (currSteps < 51200) {
    //Wait for 5 miliseconds 
    Serial.write("Y H 5");
@@ -82,7 +95,13 @@ void moveMotors(int xSteps, int ySteps) {
    Serial.write("Y H"); 
    Serial.write("Y PR \"move complete\""); 
    Serial.write("Y 100"); 
-   currSteps = Serial.read("P"); 
+  // currSteps = Serial.read("P"); 
+   if (Serial.available() > 0) {
+        // read the incoming byte:
+        currSteps = Serial.read();
+        Serial.print("Position now");
+        Serial.println(currSteps, DEC);
+  }
  }
  Serial.write("PY=0");
 }
