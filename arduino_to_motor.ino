@@ -3,15 +3,10 @@
   Arduino to motors.
  */
 
-String enable_setup_motor_x  = "PY=1 DN=X"
-String enable_setup_motor_y  = "PY=1 DN=Y"
+String enable_setup_motor_x  = "PY=1 DN=X";
+String enable_setup_motor_y  = "PY=1 DN=Y";
 void setup() {
-  // Open serial communications and wait for port to open:
-  Serial.begin(9600);
-  Serial.write(enable_setup); 
-  // send an intro:
-  Serial.println("send any byte and I'll tell you everything I can about it");
-  Serial.println();
+ 
 }
 
 void loop() {
@@ -19,12 +14,17 @@ void loop() {
   // xDiff = right - left
   // yDiff = top - bottom
   //TODO: How to get all 4 coordinates 
-  int x_diff = 100; 
+  int x_right= 100; 
+  int x_left = 30; 
+  int y_up = 40; 
+  int y_down = 40;
+  int x_diff = 0; 
   int y_diff = 0; 
   // 400 - 200 
-  int x_diff = x_right - x_left; //The voltage on RHS vs voltage on LHS 
-  int y_diff = y_up - y_down; 
+  x_diff = x_right - x_left; //The voltage on RHS vs voltage on LHS 
+  y_diff = y_up - y_down; 
   int xMotorSteps = 0; 
+  int yMotorSteps = 0;
   //142 steps per 1 degree
   if (x_diff > 0) {
     // If sun is to the right. 
@@ -35,25 +35,25 @@ void loop() {
   }
   if ( y_diff > 0) {
     // If sun is in the top half of the telescope
-    yMotorSteps = 142 * y_diff);  
-  | 
+    yMotorSteps = 142 * y_diff;  
+  }
   else if (y_diff < 0) {
     yMotorSteps = (142 * y_diff) * -1; 
   }
 
-  moveMotors(xMotorSteps, yMotorSteps)
+  moveMotors(xMotorSteps, yMotorSteps);
     
   }
 
 //Move motors X and Y positions based on 
 //the solar tracker. 
-void moveMotors(xSteps, ySteps) {
+void moveMotors(int xSteps, int ySteps) {
  Serial.begin(9600);
- Serial.write(enable_setup_motor_x); 
+ Serial.write( "PY=1 DN=X"); 
  Serial.write("R1=" + xSteps); 
  Serial.write("X LAB Su"); 
  Serial.write("X P=0");
- int currSteps = Serial.read("P"); //Get the current position of the motors
+ int currSteps = Serial.read("P "); //Get the current position of the motors
  while (currSteps < 51200) {
    //Wait for 5 miliseconds 
    Serial.write("X H 5");
@@ -66,12 +66,12 @@ void moveMotors(xSteps, ySteps) {
    Serial.write("X H 100"); 
    currSteps = Serial.read("P"); 
  }
-}
+
  Serial.write("R1=" + ySteps); 
- Serial.write(enable_setup_motor_y); 
+ Serial.write( "PY=1 DN=Y"); 
  Serial.write("Y LAB Su"); 
  Serial.write("Y P=0");
- currSteps = Serial.read("P"); //Get the current position of the motors
+ currSteps = Serial.read("P "); //Get the current position of the motors
  while (currSteps < 51200) {
    //Wait for 5 miliseconds 
    Serial.write("Y H 5");
@@ -85,7 +85,6 @@ void moveMotors(xSteps, ySteps) {
    currSteps = Serial.read("P"); 
  }
  Serial.write("PY=0");
- Serial.end();
 }
 
-}
+
