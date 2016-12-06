@@ -18,13 +18,13 @@ void loop() {
   int x_left = 30; 
   int y_up = 40; 
   int y_down = 40;
-  int x_diff = 0; 
-  int y_diff = 0; 
-  // 400 - 200 
-  x_diff = x_right - x_left; //The voltage on RHS vs voltage on LHS 
-  y_diff = y_up - y_down; 
+  //The voltage on RHS vs LHS 
+  int x_diff =  x_right - x_left;
+  //The voltage on Upper vs lower half
+  int y_diff = y_up - y_down; 
+
   int xMotorSteps = 0; 
-  int yMotorSteps = 0;
+  int yMotorStexps = 0;
   //142 steps per 1 degree
   if (x_diff > 0) {
     // If sun is to the right. 
@@ -49,10 +49,10 @@ void loop() {
 
 //Move motors X and Y positions based on 
 //the solar tracker. 
-void moveMotors(int xSteps, int ySteps) {
+void moveMotors(int xMotorSteps, int yMotorSteps) {
  Serial.begin(9600);
  Serial.write( "PY=1 DN=X"); 
- Serial.write("R1=" + xSteps); 
+ Serial.write("R1=" + xMotorSteps); 
  Serial.write("X LAB Su"); 
  Serial.write("X P=0");
   while (Serial.available() < 0) {
@@ -80,7 +80,7 @@ void moveMotors(int xSteps, int ySteps) {
   }
  }
 
- Serial.write("R1=" + ySteps); 
+ Serial.write("R1=" + yMotorSteps); 
  Serial.write( "PY=1 DN=Y"); 
  Serial.write("Y LAB Su"); 
  Serial.write("Y P=0");

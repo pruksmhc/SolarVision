@@ -1,0 +1,42 @@
+'Solar Surgery Project
+'Last edited: 9/20/16
+
+
+Hc=15         'Set hold current value
+Rc=80         'Set run current value
+A=2000000     'Set acceleration-
+D=A           'Set deceleration
+Vi=50000      'Set start velocity
+Vm=500000     'Set max velocity
+
+'Register value received via serial from Arduino
+'Holds update step
+R1=100          'Move distance variable (currently 10 microsteps) 
+
+PG 1
+  LB Su       'Start program on power up
+        BR K1      'SeSt position to zero
+  LB K1
+        P=0   'set position to zero to reset
+  LB K2      'Main program loop
+        H 5      'Program loop delay ---> set based on desired delay (currently 5ms)
+        BR K3,P<51200  'Conditional branch to K3 if full rotation not completed
+        MA 0 
+        H        'Wait until move is complete'
+        PR "move complete"
+        H 100
+        BR K1,P>=51200  'Conditional branch to K1 when full rotation completed
+  LB K3
+        MR R1    'Move R1 distance
+        H 100       'Wait for 100ms'
+        PR "POSITION = ",P 'Print current position
+        BR K2    'Branch to Label K2
+  E
+PG
+S
+ 
+
+
+
+
+ Sent with Mailtrack
